@@ -126,7 +126,7 @@ for (var i = 0; i < 100; i++) {
   window.requestAnimationFrame(draw);
 })();
 
-},{"../hark.js":2,"attachmediastream":5,"bows":4,"getusermedia":3}],3:[function(require,module,exports){
+},{"../hark.js":2,"attachmediastream":5,"bows":3,"getusermedia":4}],4:[function(require,module,exports){
 // getUserMedia helper by @HenrikJoreteg
 var func = (navigator.getUserMedia ||
             navigator.webkitGetUserMedia ||
@@ -276,6 +276,10 @@ module.exports = function(stream, options) {
   
   harker.stop = function() {
     running = false;
+    if(audioContext && audioContext.close){
+      audioContext.close();
+      audioContext = null;
+    }
     harker.emit('volume_change', -100, threshold);
     if (harker.speaking) {
       harker.speaking = false;
@@ -418,6 +422,9 @@ WildEmitter.prototype.off = function (event, fn) {
     // remove specific handler
     i = callbacks.indexOf(fn);
     callbacks.splice(i, 1);
+    if (callbacks.length === 0) {
+        delete this.callbacks[event];
+    }
     return this;
 };
 
@@ -473,7 +480,7 @@ WildEmitter.prototype.getWildcardCallbacks = function (eventName) {
     return result;
 };
 
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 (function(window) {
   var logger = require('andlog'),
       goldenRatio = 0.618033988749895,
@@ -521,7 +528,8 @@ WildEmitter.prototype.getWildcardCallbacks = function (eventName) {
         return;
     }
 
-    if (ls && ls.debug && window.console) {
+    var andlogKey = ls.andlogKey || 'debug'
+    if (ls && ls[andlogKey] && window.console) {
         out = window.console;
     } else {
         var methods = "assert,count,debug,dir,dirxml,error,exception,group,groupCollapsed,groupEnd,info,log,markTimeline,profile,profileEnd,time,timeEnd,trace,warn".split(","),
